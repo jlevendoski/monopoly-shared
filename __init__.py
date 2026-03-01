@@ -33,3 +33,21 @@ from shared.protocol import (
     GameSettings,
     parse_message,
 )
+
+from shared.pokemon import (
+    PokemonInfo,
+    ItemInfo,
+    PokemonDatabase,
+    ItemDatabase,
+    get_pokemon_database,
+    get_item_database,
+    generate_pokemon_assignments,
+    generate_item_assignments,
+)
+
+from shared.version import (
+    SHARED_VERSION,
+    DATA_VERSION,
+    DATA_POKEMON_COUNT,
+    check_compatibility,
+)
