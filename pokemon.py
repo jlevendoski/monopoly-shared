@@ -105,7 +105,7 @@ class PokemonDatabase:
         
         if data_path is None:
             # Default path relative to this file
-            data_path = Path(__file__).parent.parent.parent / "data" / "pokemon_enhanced.json"
+            data_path = Path(__file__).parent.parent / "data" / "pokemon_enhanced.json"
         
         self._load_data(data_path)
         self._analyze_evolution_chains()
@@ -381,7 +381,7 @@ class ItemDatabase:
         self._teaching_items: Dict[str, ItemInfo] = {}
         
         if data_dir is None:
-            data_dir = Path(__file__).parent.parent.parent / "data"
+            data_dir = Path(__file__).parent.parent / "data"
         
         self._load_data(data_dir)
     
