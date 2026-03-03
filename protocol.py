@@ -357,6 +357,120 @@ class DeclareBankruptcyRequest(Message):
 
 
 # =============================================================================
+# Trading Messages
+# =============================================================================
+
+@dataclass
+class ProposeTradeRequest(Message):
+    """Request to propose a trade to another player."""
+    type: MessageType = MessageType.PROPOSE_TRADE
+    
+    @classmethod
+    def create(
+        cls,
+        recipient_id: str,
+        offered_money: int = 0,
+        requested_money: int = 0,
+        offered_properties: list[int] | None = None,
+        requested_properties: list[int] | None = None,
+        offered_jail_cards: int = 0,
+        requested_jail_cards: int = 0,
+        request_id: str | None = None,
+    ) -> "ProposeTradeRequest":
+        return cls(
+            data={
+                "recipient_id": recipient_id,
+                "offered_money": offered_money,
+                "requested_money": requested_money,
+                "offered_properties": offered_properties or [],
+                "requested_properties": requested_properties or [],
+                "offered_jail_cards": offered_jail_cards,
+                "requested_jail_cards": requested_jail_cards,
+            },
+            request_id=request_id,
+        )
+
+
+@dataclass
+class AcceptTradeRequest(Message):
+    """Request to accept a pending trade."""
+    type: MessageType = MessageType.ACCEPT_TRADE
+    
+    @classmethod
+    def create(cls, trade_id: str, request_id: str | None = None) -> "AcceptTradeRequest":
+        return cls(data={"trade_id": trade_id}, request_id=request_id)
+
+
+@dataclass
+class RejectTradeRequest(Message):
+    """Request to reject a pending trade."""
+    type: MessageType = MessageType.REJECT_TRADE
+    
+    @classmethod
+    def create(cls, trade_id: str, request_id: str | None = None) -> "RejectTradeRequest":
+        return cls(data={"trade_id": trade_id}, request_id=request_id)
+
+
+@dataclass
+class CancelTradeRequest(Message):
+    """Request to cancel a trade you proposed."""
+    type: MessageType = MessageType.CANCEL_TRADE
+    
+    @classmethod
+    def create(cls, trade_id: str, request_id: str | None = None) -> "CancelTradeRequest":
+        return cls(data={"trade_id": trade_id}, request_id=request_id)
+
+
+@dataclass
+class TradeProposedMessage(Message):
+    """Broadcast when a trade is proposed."""
+    type: MessageType = MessageType.TRADE_PROPOSED
+    
+    @classmethod
+    def create(cls, trade: dict) -> "TradeProposedMessage":
+        """trade should be the Trade.to_dict() output."""
+        return cls(data={"trade": trade})
+
+
+@dataclass
+class TradeCompletedMessage(Message):
+    """Broadcast when a trade is accepted and executed."""
+    type: MessageType = MessageType.TRADE_COMPLETED
+    
+    @classmethod
+    def create(cls, trade: dict) -> "TradeCompletedMessage":
+        return cls(data={"trade": trade})
+
+
+@dataclass
+class TradeRejectedMessage(Message):
+    """Broadcast when a trade is rejected by the recipient."""
+    type: MessageType = MessageType.TRADE_REJECTED
+    
+    @classmethod
+    def create(cls, trade_id: str, rejected_by_id: str, rejected_by_name: str) -> "TradeRejectedMessage":
+        return cls(data={
+            "trade_id": trade_id,
+            "rejected_by_id": rejected_by_id,
+            "rejected_by_name": rejected_by_name,
+        })
+
+
+@dataclass
+class TradeCancelledMessage(Message):
+    """Broadcast when a trade is cancelled by the proposer."""
+    type: MessageType = MessageType.TRADE_CANCELLED
+    
+    @classmethod
+    def create(cls, trade_id: str, cancelled_by_id: str, cancelled_by_name: str) -> "TradeCancelledMessage":
+        return cls(data={
+            "trade_id": trade_id,
+            "cancelled_by_id": cancelled_by_id,
+            "cancelled_by_name": cancelled_by_name,
+        })
+        
+
+# =============================================================================
 # Server Response/Broadcast Messages (Server -> Client)
 # =============================================================================
 
@@ -625,7 +739,7 @@ class GameWonMessage(Message):
 @dataclass 
 class PlayerJoinedMessage(Message):
     """Broadcast when a player joins the game."""
-    type: MessageType = MessageType.JOIN_GAME
+    type: MessageType = MessageType.PLAYER_JOINED
     
     @classmethod
     def create(
@@ -644,7 +758,7 @@ class PlayerJoinedMessage(Message):
 @dataclass
 class PlayerLeftMessage(Message):
     """Broadcast when a player leaves the game."""
-    type: MessageType = MessageType.LEAVE_GAME
+    type: MessageType = MessageType.PLAYER_LEFT
     
     @classmethod
     def create(
@@ -661,7 +775,7 @@ class PlayerLeftMessage(Message):
 @dataclass
 class PlayerKickedMessage(Message):
     """Broadcast when a player is kicked from the game."""
-    type: MessageType = MessageType.KICK_PLAYER
+    type: MessageType = MessageType.PLAYER_KICKED
     
     @classmethod
     def create(
@@ -680,7 +794,7 @@ class PlayerKickedMessage(Message):
 @dataclass
 class HostTransferredMessage(Message):
     """Broadcast when host privileges are transferred."""
-    type: MessageType = MessageType.TRANSFER_HOST
+    type: MessageType = MessageType.HOST_TRANSFERRED
     
     @classmethod
     def create(
