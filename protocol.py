@@ -114,12 +114,14 @@ class JoinGameRequest(Message):
         cls,
         game_id: str,
         player_name: str,
+        as_spectator: bool = False,
         request_id: str | None = None
     ) -> "JoinGameRequest":
         return cls(
             data={
                 "game_id": game_id,
                 "player_name": player_name,
+                "as_spectator": as_spectator,
             },
             request_id=request_id,
         )
